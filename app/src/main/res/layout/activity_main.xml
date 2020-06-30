@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnStartService"
+        android:layout_width="230dp"
+        android:layout_height="wrap_content"
+        android:text="Start Service"
+        android:layout_marginTop="24dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnStopService"
+        android:layout_width="230dp"
+        android:layout_height="wrap_content"
+        android:text="Stop Service"
+        app:layout_constraintEnd_toEndOf="@+id/btnStartService"
+        app:layout_constraintStart_toStartOf="@+id/btnStartService"
+        app:layout_constraintTop_toBottomOf="@+id/btnStartService" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnStartDownloadManager"
+        android:layout_width="230dp"
+        android:layout_height="wrap_content"
+        android:text="Start download manager"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="@+id/btnStopService"
+        app:layout_constraintStart_toStartOf="@+id/btnStopService"
+        app:layout_constraintTop_toBottomOf="@+id/btnStopService" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnStopDownloadManager"
+        android:layout_width="230dp"
+        android:layout_height="wrap_content"
+        android:text="Stop download manager"
+        app:layout_constraintEnd_toEndOf="@+id/btnStartDownloadManager"
+        app:layout_constraintStart_toStartOf="@+id/btnStartDownloadManager"
+        app:layout_constraintTop_toBottomOf="@+id/btnStartDownloadManager" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnStartAlarmManager"
+        android:layout_width="230dp"
+        android:layout_height="wrap_content"
+        android:text="Start alarm manager"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="@+id/btnStopDownloadManager"
+        app:layout_constraintStart_toStartOf="@+id/btnStopDownloadManager"
+        app:layout_constraintTop_toBottomOf="@+id/btnStopDownloadManager" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnStopAlarmManager"
+        android:layout_width="230dp"
+        android:layout_height="wrap_content"
+        android:text="Stop alarm manager"
+        app:layout_constraintEnd_toEndOf="@+id/btnStartAlarmManager"
+        app:layout_constraintStart_toStartOf="@+id/btnStartAlarmManager"
+        app:layout_constraintTop_toBottomOf="@+id/btnStartAlarmManager" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnStartWorkManager"
+        android:layout_width="230dp"
+        android:layout_height="wrap_content"
+        android:text="Start work manager"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="@+id/btnStopAlarmManager"
+        app:layout_constraintStart_toStartOf="@+id/btnStopAlarmManager"
+        app:layout_constraintTop_toBottomOf="@+id/btnStopAlarmManager" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnStopWorkManager"
+        android:layout_width="230dp"
+        android:layout_height="wrap_content"
+        android:text="Stop work manager"
+        app:layout_constraintEnd_toEndOf="@+id/btnStartWorkManager"
+        app:layout_constraintStart_toStartOf="@+id/btnStartWorkManager"
+        app:layout_constraintTop_toBottomOf="@+id/btnStartWorkManager" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnStartIntentService"
+        android:layout_width="230dp"
+        android:layout_height="wrap_content"
+        android:text="Start intent service"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="@+id/btnStopWorkManager"
+        app:layout_constraintStart_toStartOf="@+id/btnStopWorkManager"
+        app:layout_constraintTop_toBottomOf="@+id/btnStopWorkManager" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_LOG_LEVEL" value="verbose" />
+    <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="76e33265-f84a-4350-be06-4bc38433c622" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/assets/images/ic_account.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/data/models/responses/data/additional_products.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/presentation/screens/home/widgets/menu/item_categories_menu_widget.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/presentation/screens/notification/widgets/item_notification_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/localizations/localization_en.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/localizations/localization_en.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/data/models/responses/data/invoice.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/data/models/responses/data/invoice.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/data/models/responses/data/invoices_data.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/data/models/responses/data/invoices_data.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/data/models/responses/data/notification_data.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/data/models/responses/data/notification_data.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/data/models/responses/data/order_details.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/data/models/responses/data/order_details.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/data/models/responses/data/orders_data.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/data/models/responses/data/orders_data.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/data/models/responses/data/orders_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/data/models/responses/data/orders_model.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/data/models/responses/data/product_data.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/data/models/responses/data/product_data.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/data/models/responses/data/products_data.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/data/models/responses/data/products_data.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/data/repositories/network/jomla_api_repository/api_constants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/data/repositories/network/jomla_api_repository/api_constants.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/data/repositories/network/jomla_api_repository/jomla_api_repository.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/data/repositories/network/jomla_api_repository/jomla_api_repository.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/data/repositories/network/jomla_api_repository/jomla_api_repository_impl.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/data/repositories/network/jomla_api_repository/jomla_api_repository_impl.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/domain/blocs/invoices/invoices_bloc.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/domain/blocs/invoices/invoices_bloc.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/domain/blocs/invoices/invoices_event.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/domain/blocs/invoices/invoices_event.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/domain/blocs/invoices/invoices_state.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/domain/blocs/invoices/invoices_state.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/domain/blocs/notification/notification_bloc.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/domain/blocs/notification/notification_bloc.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/domain/blocs/notification/notification_event.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/domain/blocs/notification/notification_event.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/domain/blocs/notification/notification_state.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/domain/blocs/notification/notification_state.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/domain/blocs/orders/orders_bloc.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/domain/blocs/orders/orders_bloc.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/domain/blocs/orders/orders_event.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/domain/blocs/orders/orders_event.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/domain/blocs/orders/orders_state.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/domain/blocs/orders/orders_state.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/domain/use_cases/invoices/invoices_use_case.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/domain/use_cases/invoices/invoices_use_case.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/domain/use_cases/invoices/invoices_use_case_impl.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/domain/use_cases/invoices/invoices_use_case_impl.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/domain/use_cases/orders/orders_use_case_impl.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/domain/use_cases/orders/orders_use_case_impl.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/common_widgets/common_widgets.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/common_widgets/common_widgets.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/brands/widgets/brands_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/brands/widgets/brands_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/li

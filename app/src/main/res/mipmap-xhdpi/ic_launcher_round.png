@@ -1,0 +1,189 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:jomla/data/models/responses/data/order_details.dart';
+import 'package:jomla/data/models/responses/data/orders_model.dart';
+import 'package:jomla/domain/blocs/orders/orders_bloc.dart';
+import 'package:jomla/domain/blocs/orders/orders_event.dart';
+import 'package:jomla/presentation/appearance/colors.dart';
+import 'package:jomla/presentation/appearance/constants.dart';
+import 'package:jomla/presentation/appearance/text_styles.dart';
+import 'package:jomla/presentation/common_widgets/common_widgets.dart';
+import 'package:jomla/presentation/screens/orders/order_button_type.dart';
+import 'package:jomla/presentation/screens/orders/widgets/item_order_product_widget.dart';
+import 'package:jomla/utils/localization/app_localizations.dart';
+
+class ItemOrder extends StatelessWidget {
+  final SimpleOrdersModel orders;
+  OrdersBloc bloc;
+
+  ItemOrder(this.orders);
+
+  @override
+  Widget build(BuildContext context) {
+    bloc = context.bloc<OrdersBloc>();
+    return Column(
+      children: <Widget>[
+        _itemOrderDates(context),
+        _itemShareAndDetailsButtons(context),
+        orders.orderDetails != null
+            ? _listProducts(orders.orderDetails.orderLines.orderItems)
+            : Container()
+      ],
+    );
+  }
+
+  Widget _itemOrderDates(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(left: 16, right: 32, top: 16, bottom: 16),
+      margin: EdgeInsets.only(bottom: 2),
+      color: AppColors.getColor(COLOR_WHITE),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Text(getText(context, 'order'),
+                      style: textStyle(
+                          AppColors.getColor(COLOR_GRAY), FontWeight.w700, 14,
+                          fontFamily: VISBY_BOLD_FONT_FAMILY)),
+                  space(right: 5),
+                  Text(orders.order.name,
+                      style: textStyle(
+                          AppColors.getColor(COLOR_GRAY), FontWeight.w700, 14,
+                          fontFamily: VISBY_BOLD_FONT_FAMILY))
+                ],
+              ),
+              Text(orders.order.dateOrder,
+                  style: textStyle(
+                      AppColors.getColor(COLOR_GRAY).withOpacity(0.5),
+                      FontWeight.w400,
+                      12))
+            ],
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text(orders.order.amountTotal.toString(),
+                  style: textStyle(
+                      AppColors.getColor(COLOR_GRAY), FontWeight.w700, 14)),
+              Text(orders.order.currencyId.symbol,
+                  style: textStyle(
+                      AppColors.getColor(COLOR_GRAY), FontWeight.w400, 12))
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                  orders.order.deliveryStatus != null ? orders.order.deliveryStatus : '',
+                  style: textStyle(AppColors.getColor(_handleStatusColor()), FontWeight.w400, 13))
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _itemShareAndDetailsButtons(BuildContext context) {
+    return Container(
+      child: Row(
+        children: <Widget>[
+          Expanded(
+              child: _imageTextButton(
+                  context,
+                  'assets/images/ic_share_invoice.svg',
+                  'share',
+                  false,
+                  () {},
+                  OrderButtonType.share)),
+          SizedBox(height: 30, child: verticalLine(COLOR_GRAY_LIGHT_TEXT, 1)),
+          Expanded(
+              child: _imageTextButton(context, 'assets/images/ic_details.svg',
+                  'details', true, () {}, OrderButtonType.details))
+        ],
+      ),
+    );
+  }
+
+  Widget _listProducts(List<OrderItem> orderItems) {
+    return Visibility(
+      maintainAnimation: true,
+      maintainState: true,
+      visible: orders.isExpandedOrder,
+      child: Container(
+        child: ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: orderItems.length,
+            itemBuilder: (BuildContext context, int index) =>
+                ItemOrderProductWidget(orderItems[index])),
+      ),
+    );
+  }
+
+  Widget _imageTextButton(
+      BuildContext context,
+      String imagePath,
+      String textKey,
+      bool isDetails,
+      Function action,
+      OrderButtonType orderButtonType) {
+    return SizedBox(
+      height: 30,
+      child: Material(
+        color: AppColors.getColor(COLOR_GRAY_LIGHT),
+        child: InkWell(
+          onTap: () {
+            switch (orderButtonType) {
+              case OrderButtonType.share:
+                bloc.add(GetOrdersDetailsEvent(
+                    orders.order.id, OrderButtonType.share));
+                break;
+              case OrderButtonType.details:
+                if (orders.isExpandedOrder) {
+                  bloc.add(HideListProductEvent(orders.order.id));
+                } else {
+                  bloc.add(GetOrdersDetailsEvent(
+                      orders.order.id, OrderButtonType.details));
+                }
+                break;
+            }
+          },
+          child: Row(
+            mainAxisAlignment:
+                isDetails ? MainAxisAlignment.end : MainAxisAlignment.center,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  SvgPicture.asset(imagePath,
+                      width: 15,
+                      height: 15,
+                      fit: BoxFit.cover,
+                      color: AppColors.getColor(COLOR_GRAY)),
+                  space(right: 5),
+                  Text(getText(context, textKey),
+                      style: textStyle(
+                          AppColors.getColor(COLOR_GRAY), FontWeight.bold, 10,
+                          fontFamily: MUSEO_FONT_FEMILY)),
+                ],
+              ),
+              isDetails ? _detailsArrow() : Container(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _detailsArrow() {
+    return Container(
+        alignment: Alignment.centerRight,
+        margin: EdgeInsets.only(left: 40, right: 24),
+        child: Icon(
+            orders.isExpandedOrder
+                ? Icons.keyboard_arrow_up
+                : I

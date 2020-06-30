@@ -1,0 +1,407 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:jomla/data/models/responses/data/partner_data.dart';
+import 'package:jomla/domain/blocs/global/global_bloc.dart';
+import 'package:jomla/domain/blocs/profile/profile_bloc.dart';
+import 'package:jomla/domain/blocs/profile/profile_event.dart';
+import 'package:jomla/domain/blocs/profile/profile_state.dart';
+import 'package:jomla/domain/use_cases/location/models/location_model.dart';
+import 'package:jomla/presentation/appearance/colors.dart';
+import 'package:jomla/presentation/appearance/constants.dart';
+import 'package:jomla/presentation/appearance/text_styles.dart';
+import 'package:jomla/presentation/base/base_state_with_bloc.dart';
+import 'package:jomla/presentation/common_widgets/common_widgets.dart';
+import 'package:jomla/presentation/common_widgets/toolbars/simple/simple_toolbar.dart';
+import 'package:jomla/presentation/screens/profile/widgets/item_profile_addresses_widget.dart';
+import 'package:jomla/presentation/screens/select_location/SelectLocationType.dart';
+import 'package:jomla/utils/localization/app_localizations.dart';
+import 'package:jomla/utils/mask_text_input_formatter.dart';
+import 'package:jomla/utils/navigation/navigation_manager.dart';
+import 'package:jomla/utils/validation_utils.dart';
+
+class ProfileWidget extends StatefulWidget {
+  @override
+  _ProfileWidgetState createState() => _ProfileWidgetState();
+}
+
+class _ProfileWidgetState
+    extends BaseStateWithBloc<ProfileWidget, ProfileBloc> {
+  File imageFile;
+  bool isPrimaryAddress = false;
+  GlobalBloc _globalBloc;
+  final GlobalKey<FormState> _textFormKey = GlobalKey<FormState>();
+  final TextEditingController _fullNameTextController = TextEditingController();
+  final TextEditingController _emailTextController = TextEditingController();
+  final TextEditingController _phoneNumberTextController =
+      TextEditingController();
+  final TextEditingController _organizationTextController =
+      TextEditingController();
+  final SlidableController _slidableController = SlidableController();
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _fullNameFocusNode = FocusNode();
+  final FocusNode _phoneNumberFocusNode = FocusNode();
+  final FocusNode _organizationFocusNode = FocusNode();
+  MaskTextInputFormatter _numberTextInputFormatter = MaskTextInputFormatter(
+      mask: "+966 (#) #### ####", filter: {"#": RegExp(r'[0-9]')});
+
+  @override
+  PreferredSizeWidget getAppBar() => SimpleToolbar(bloc, 'profile',
+      leftButtonName: 'cancel', rightButtonName: 'done');
+
+  @override
+  void initState() {
+    super.initState();
+    _globalBloc = context.bloc<GlobalBloc>();
+    _initTextFieldControllers(_globalBloc.partnerData);
+  }
+
+  @override
+  Widget getWidget(BuildContext context) {
+    return BlocConsumer<ProfileBloc, ProfileState>(
+      listener: (context, state) {
+        if (state is SuccessLogoutState) {
+          NavigationManager.navigateToLogInScreen(context,
+              isKeepBackStack: false);
+        }
+        if (state is SuccessClickDoneState) {
+          if (_isNameChanged(state.partnerData) ||
+              _isEmailChanged(state.partnerData) ||
+              _isPhoneChanged(state.partnerData) ||
+              imageFile != null) {
+            final form = _textFormKey.currentState;
+            form.save();
+            bloc.add(UpdateProfileEvent(state.partnerData));
+          }
+        }
+
+        if (state is SuccessUpdateProfileState) {
+          _userInfo(state.partnerData);
+        }
+      },
+      builder: (context, state) {
+        return _screenContainer(state, context);
+      },
+    );
+  }
+
+  bool _isNameChanged(PartnerData partnerData) {
+    return _fullNameTextController.text == partnerData.name ? false : true;
+  }
+
+  bool _isEmailChanged(PartnerData partnerData) {
+    return _emailTextController.text == partnerData.email ? false : true;
+  }
+
+  bool _isPhoneChanged(PartnerData partnerData) {
+    return _phoneNumberTextController.text == partnerData.phone ? false : true;
+  }
+
+//  bool _isCompanyChanged(PartnerData partnerData){
+//    return _organizationTextController.text == partnerData.companyName ? false : true;
+//  }
+
+  void _initTextFieldControllers(PartnerData partnerData) {
+    _fullNameTextController.text = partnerData.phone;
+    _emailTextController.text = partnerData.email;
+    _phoneNumberTextController.text = partnerData.phone;
+    _fullNameTextController.text = partnerData.name;
+  }
+
+  Widget _screenContainer(ProfileState state, BuildContext context) {
+    return singleScrollComponent(
+      child: Container(
+        color: AppColors.getColor(COLOR_GRAY_LIGHT),
+        child: Column(
+          children: <Widget>[
+            _userInfo(state.partnerData),
+            _personalInfoTitle(context),
+            _formUserData(context, state.partnerData),
+            _shippingAddressesTitle(context),
+            Container(
+              color: AppColors.getColor(COLOR_WHITE),
+              margin: EdgeInsets.only(bottom: 1),
+              child: _generateItemsList(state.partnerData),
+            ),
+            _addNewAddress(context, state.partnerData),
+            _logout(context)
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _logout(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => bloc.add(DoLogoutEvent()),
+        child: Container(
+          margin: EdgeInsets.only(left: 24, top: 10, bottom: 10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(getText(context, 'logout'),
+                    style: textStyle(
+                        AppColors.getColor(COLOR_RED).withOpacity(0.9),
+                        FontWeight.w700,
+                        14,
+                        fontFamily: MUSEO_500_FONT_FAMILY)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _addNewAddress(BuildContext context, PartnerData partnerData) {
+    return Container(
+      color: AppColors.getColor(COLOR_WHITE),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Padding(
+            padding:
+                const EdgeInsets.only(left: 22, right: 8, top: 15, bottom: 15),
+            child: SvgPicture.asset('assets/images/green_earth.svg',
+                color: AppColors.getColor(COLOR_MAIN), width: 24, height: 24),
+          ),
+          textButton(context, () => _goToSelectLocationScreen(partnerData),
+              'add_new_address', COLOR_MAIN, 14,
+              fontWeight: FontWeight.bold),
+        ],
+      ),
+    );
+  }
+
+  void _goToSelectLocationScreen(PartnerData partnerData) async {
+    LocationModel locationModel =
+        await NavigationManager.navigateToSelectLocationScreenToGetData(context,
+            selectLocationType: SelectLocationType.profile);
+    if (locationModel != null) {
+      bloc.add(CreateNewPartnerEvent(locationModel));
+    }
+  }
+
+  void _editLocation(PartnerData partnerData, int id, int position) async {
+    LocationModel locationModel =
+        await NavigationManager.navigateToSelectLocationScreenToGetData(context,
+            selectLocationType: SelectLocationType.profile);
+    if (locationModel != null) {
+      bloc.add(UpdatePartnerEvent(id, locationModel, position));
+    }
+  }
+
+  Widget _shippingAddressesTitle(BuildContext context) {
+    return Container(
+      height: 36,
+      margin: EdgeInsets.only(left: 22),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(getText(context, 'shipping_addresses'),
+                style: textStyle(
+                    AppColors.getColor(COLOR_GRAY_DARK_TEXT).withOpacity(0.9),
+                    FontWeight.w700,
+                    14,
+                    fontFamily: MUSEO_500_FONT_FAMILY)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _formUserData(BuildContext context, PartnerData partnerData) {
+    return Container(
+      color: AppColors.getColor(COLOR_WHITE),
+      child: Form(
+        key: _textFormKey,
+        child: Column(
+          children: <Widget>[
+            _textFieldFullName(context, partnerData),
+            _textFieldEmail(context, partnerData),
+            _textFieldPhoneNumber(context, partnerData),
+            _textFieldCompanyName(context, partnerData),
+            _passwordButton()
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _personalInfoTitle(BuildContext context) {
+    return Container(
+      height: 36,
+      margin: EdgeInsets.only(left: 22),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(getText(context, 'personal_information'),
+                style: textStyle(
+                    AppColors.getColor(COLOR_GRAY_DARK_TEXT).withOpacity(0.9),
+                    FontWeight.w700,
+                    14,
+                    fontFamily: MUSEO_500_FONT_FAMILY)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _userInfo(PartnerData partnerData) {
+    return Container(
+      width: double.infinity,
+      color: AppColors.getColor(COLOR_WHITE),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          _roundImage(partnerData),
+          Padding(
+            padding: const EdgeInsets.only(top: 5, bottom: 5),
+            child: Text(getText(context, 'edit'),
+                style: textStyle(
+                    AppColors.getColor(COLOR_GRAY_DARK_TEXT).withOpacity(0.4),
+                    FontWeight.w400,
+                    12)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Material _roundImage(PartnerData partnerData) {
+    return Material(
+      child: Padding(
+        padding: EdgeInsets.only(top: 10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(43),
+          onTap: () {
+            _openGallery(context);
+          },
+          child: Container(
+            height: 66,
+            width: 66,
+            child: imageFile == null
+                ? privateNetworkImage(partnerData.image)
+                : fileImage(imageFile),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _passwordButton() {
+    return Material(
+      child: InkWell(
+          onTap: () => {},
+          child: Container(
+            padding: const EdgeInsets.only(left: 8, top: 8, bottom: 16),
+            child: Row(
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Text(getText(context, 'password'),
+                          style: textStyle(
+                              AppColors.getColor(COLOR_GRAY).withOpacity(0.5),
+                              FontWeight.w400,
+                              12)),
+                    ),
+                    _passwordCircles(),
+                  ],
+                ),
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.only(right: 19),
+                    alignment: Alignment.centerRight,
+                    child: SvgPicture.asset(
+                      'assets/images/ic_arrow_right_green.svg',
+                      color: AppColors.getColor(COLOR_GRAY).withOpacity(0.6),
+                      width: 7,
+                      height: 10,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )),
+    );
+  }
+
+  Container _passwordCircles() {
+    return Container(
+        margin: EdgeInsets.only(left: 16),
+        child: Row(
+          children: List.generate(8, (n) => Icon(Icons.lens, size: 8)),
+        ));
+  }
+
+  Widget _textFieldFullName(BuildContext context, PartnerData partnerData) {
+    return customFormTextField(context, 'full_name_optional',
+        _fullNameTextController, _fullNameFocusNode, (term) {
+      _fieldFocusChangeNext(context, _fullNameFocusNode, _emailFocusNode);
+    }, (string) {
+      bloc.add(SetFulNameEvent(_fullNameTextController.text));
+    },
+        isValidField: (bloc.state is InitialProfileState)
+            ? true
+            : ValidationUtils.validateEmptyField(_fullNameTextController.text),
+        errorHeaderTextKey: 'please_enter_required_data',
+        errorTextKey: 'field_must_not_be_empty',
+        userData: partnerData.name);
+  }
+
+  Widget _textFieldPhoneNumber(BuildContext context, PartnerData partnerData) {
+    return customFormTextField(context, 'phone_number_optional',
+        _phoneNumberTextController, _phoneNumberFocusNode, (term) {
+      _fieldFocusChangeNext(
+          context, _phoneNumberFocusNode, _organizationFocusNode);
+    }, (string) {
+      bloc.add(SetPhoneNumberEvent(_phoneNumberTextController.text));
+    },
+        inputFormatter: <TextInputFormatter>[_numberTextInputFormatter],
+        textInputType: TextInputType.phone,
+        isValidField: (bloc.state is InitialProfileState)
+            ? true
+            : ValidationUtils.validatePhone(_phoneNumberTextController.text),
+        errorHeaderTextKey: 'please_enter_required_data',
+        errorTextKey: 'invalid_phone_error',
+        userData: partnerData.phone);
+  }
+
+  Widget _textFieldEmail(BuildContext context, PartnerData partnerData) {
+    return customFormTextField(
+        context, 'business_email', _emailTextController, _emailFocusNode,
+        (term) {
+      _fieldFocusChangeNext(context, _emailFocusNode, _phoneNumberFocusNode);
+    }, (string) {
+      bloc.add(SetEmailEvent(_emailTextController.text));
+    },
+        textInputType: TextInputType.emailAddress,
+        isValidField: (bloc.state is InitialProfileState)
+            ? true
+            : ValidationUtils.validateEmptyField(_emailTextController.text),
+        errorHeaderTextKey: 'please_enter_required_data',
+        errorTextKey: 'field_must_not_be_empty',
+        userData: partnerData.email);
+  }
+
+  Widget _textFieldCompanyName(BuildContext context, PartnerData partnerData) {
+    return customFormTextFi
