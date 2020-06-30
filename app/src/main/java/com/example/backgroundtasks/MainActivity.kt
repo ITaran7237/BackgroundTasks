@@ -14,9 +14,10 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.example.backgroundtasks.alarmManager.startAlarmManager
 import com.example.backgroundtasks.alarmManager.stopAlarmManager
+import com.example.backgroundtasks.downloadManager.TestDownloadManager
+import com.example.backgroundtasks.intentService.TestIntentService
 import com.example.backgroundtasks.service.EXTRA_KEY_NUMBER
 import com.example.backgroundtasks.service.START_UPDATE_ACTION
-import com.example.backgroundtasks.intentService.TestIntentService
 import com.example.backgroundtasks.utils.launchTestService
 import com.example.backgroundtasks.workManager.TestWorkManager
 import kotlinx.android.synthetic.main.activity_main.*
@@ -25,12 +26,13 @@ import java.util.concurrent.TimeUnit
 class MainActivity : AppCompatActivity() {
 
     companion object {
+        const val DOWNLOAD_TEST_LINK = "https://github.com/username/projectname/archive/hello.zip"
         const val START_FOREGROUND_ACTION = "start_foreground"
         const val STOP_FOREGROUND_ACTION = "stop_foreground"
         const val EVENT_ACTION = "EVENT_ACTION"
         const val ALARM_EVENT = "ALARM_EVENT"
     }
-
+    private val downloadManager by lazy { TestDownloadManager(applicationContext, DOWNLOAD_TEST_LINK, "hello.zip") }
     private val oneTimeWorkRequest = OneTimeWorkRequest.Builder(TestWorkManager::class.java).build()
     private val periodicWorkRequest = PeriodicWorkRequest.Builder(TestWorkManager::class.java, 15, TimeUnit.MINUTES).build()
     private val workManager = WorkManager.getInstance(application)
@@ -39,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initButtonClickListener()
+        observeWorkManager()
     }
 
     override fun onStart() {
@@ -47,12 +50,12 @@ class MainActivity : AppCompatActivity() {
         timerIntentFilter.addAction(START_UPDATE_ACTION)
         timerIntentFilter.addCategory(Intent.CATEGORY_DEFAULT)
         registerReceiver(testServiceReceiver, timerIntentFilter)
-        registerReceiver(toastBroadcastReceiver, IntentFilter(ALARM_EVENT))
+        registerReceiver(alarmManagerReceiver, IntentFilter(ALARM_EVENT))
     }
 
     override fun onStop() {
         unregisterReceiver(testServiceReceiver)
-        unregisterReceiver(toastBroadcastReceiver)
+        unregisterReceiver(alarmManagerReceiver)
         super.onStop()
     }
 
@@ -60,8 +63,8 @@ class MainActivity : AppCompatActivity() {
         btnStartService.setOnClickListener { launchTestService(this, START_FOREGROUND_ACTION) }
         btnStopService.setOnClickListener { launchTestService(this, STOP_FOREGROUND_ACTION) }
 
-        btnStartDownloadManager.setOnClickListener { }
-        btnStopDownloadManager.setOnClickListener { }
+        btnStartDownloadManager.setOnClickListener { downloadManager.downloadFile() }
+        btnStopDownloadManager.setOnClickListener { downloadManager.stopDownloadAllFiles() }
 
         btnStartAlarmManager.setOnClickListener { startAlarmManager(applicationContext, 2000) }
         btnStopAlarmManager.setOnClickListener { stopAlarmManager(applicationContext) }
@@ -76,7 +79,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnStartIntentService.setOnClickListener { startService(Intent(this, TestIntentService::class.java)) }
+    }
 
+    private fun observeWorkManager(){
         workManager.getWorkInfoByIdLiveData(oneTimeWorkRequest.id)
             .observe(this, Observer<WorkInfo> {
                 println(">>> isFinished oneTimeWorkRequest = ${it.state.isFinished}  status = ${it.state.name}")
@@ -95,7 +100,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val toastBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+    private val alarmManagerReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
             if (intent?.action == ALARM_EVENT) {
                 Toast.makeText(this@MainActivity, "Alarm Triggered", Toast.LENGTH_LONG).show()
